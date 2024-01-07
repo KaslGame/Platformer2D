@@ -5,18 +5,23 @@ using UnityEngine.Events;
 
 [RequireComponent(typeof(Rigidbody2D))]
 [RequireComponent(typeof(GroundCheck))]
+[RequireComponent(typeof(SpriteRenderer))]
+[RequireComponent(typeof(Player))]
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField] private float _speed;
     [SerializeField] private float _jumpForce;
 
-    public event UnityAction<bool> Walking;
     public event UnityAction Jumping;
 
-    private bool _onGround = false;
     private Rigidbody2D _rigidbody2D;
     private SpriteRenderer _spriteRenderer;
     private GroundCheck _groundCheck;
+
+    private bool _onGround = false;
+    private bool _isStop = false;
+
+    public bool IsStop => _isStop;
 
     private void Awake()
     {
@@ -42,20 +47,29 @@ public class PlayerMovement : MonoBehaviour
 
     private void Update()
     {
+        if (_isStop)
+        {
+            _rigidbody2D.velocity = new Vector2(Vector2.zero.x, Vector2.zero.y);
+            return;
+        }
+
         Move();
         Jump();
+    }
+
+    private void ChangeStopStatus()
+    {
+        if (_isStop) 
+            _isStop = false;
+        else
+            _isStop = true;
     }
 
     private void Move()
     {
         float direction = Input.GetAxis("Horizontal");
         _rigidbody2D.velocity = new Vector2(direction * _speed, _rigidbody2D.velocity.y);
-        _spriteRenderer.flipX = direction < 0 ? true : false;
-
-        if (Mathf.Abs(direction) > 0)
-            Walking?.Invoke(true);
-        else
-            Walking?.Invoke(false);
+        TryFlip(direction);
     }
 
     private void Jump()
@@ -65,5 +79,13 @@ public class PlayerMovement : MonoBehaviour
             _rigidbody2D.AddForce(Vector2.up * _jumpForce, ForceMode2D.Impulse);
             Jumping?.Invoke();
         }
+    }
+
+    private void TryFlip(float direction)
+    {
+        if (direction > 0)
+            transform.rotation = Quaternion.identity;
+        else if (direction < 0)
+            transform.rotation = Quaternion.Euler(0, 180, 0);
     }
 }

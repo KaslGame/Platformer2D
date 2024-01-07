@@ -8,12 +8,10 @@ public class Coin : MonoBehaviour
     {
         int oneCoin = 1;
 
-        if (collision.gameObject.TryGetComponent(out PlayerMovement _))
+        if (collision.gameObject.TryGetComponent(out Wallet wallet))
         {
-            Wallet _wallet = collision.gameObject.GetComponent<Wallet>();
-
             Destroy(gameObject);
-            _wallet.AddMoney(oneCoin);
+            wallet.AddMoney(oneCoin);
         }
     }
 }
