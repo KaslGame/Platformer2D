@@ -6,7 +6,7 @@ using UnityEngine;
 [RequireComponent(typeof(PlayerMovement))]
 [RequireComponent(typeof(GroundCheck))]
 [RequireComponent(typeof(Animator))]
-[RequireComponent(typeof(Player))]
+[RequireComponent(typeof(Health))]
 public class PlayerAnimation : MonoBehaviour
 {
     private readonly int HurtTrigger = Animator.StringToHash("Hurt");
@@ -17,28 +17,28 @@ public class PlayerAnimation : MonoBehaviour
     private GroundCheck _groundCheck;
     private PlayerMovement _playerMovement;
     private Animator _animator;
-    private Player _player;
+    private Health _playerHealth;
 
     private void Awake()
     {
         _animator = GetComponent<Animator>();
         _groundCheck = GetComponent<GroundCheck>();
         _playerMovement = GetComponent<PlayerMovement>();
-        _player = GetComponent<Player>();
+        _playerHealth = GetComponent<Health>();
     }
 
     private void OnEnable()
     {
         _playerMovement.Jumping += OnJumping;
         _groundCheck.StateOnGroundChange += OnStateOnGroundChange;
-        _player.HealthChange += OnHealthChange;
+        _playerHealth.HealthChanged += OnHealthChanged;
     }
 
     private void OnDisable()
     {
         _playerMovement.Jumping -= OnJumping;
         _groundCheck.StateOnGroundChange -= OnStateOnGroundChange;
-        _player.HealthChange += OnHealthChange;
+        _playerHealth.HealthChanged += OnHealthChanged;
     }
 
     private void Update()
@@ -46,9 +46,10 @@ public class PlayerAnimation : MonoBehaviour
         Walking();
     }
 
-    private void OnHealthChange(int health)
+    private void OnHealthChanged(int health, int oldHealth)
     {
-        _animator.SetTrigger(HurtTrigger);
+        if (oldHealth > health)
+            _animator.SetTrigger(HurtTrigger);
     }
 
     private void Walking()

@@ -10,9 +10,11 @@ public class Heart : MonoBehaviour
 
         if (collision.gameObject.TryGetComponent(out Player player))
         {
-            if (player.CurrentHealth < player.MaxHealth)
+            Health playerHealth = player.GetComponent<Health>();
+
+            if (playerHealth.CurrentHealth < playerHealth.MaxHealth)
             {
-                player.Healh(healhCount);
+                playerHealth.Healh(healhCount);
                 Destroy(gameObject);
             }
         }
