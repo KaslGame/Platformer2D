@@ -38,18 +38,26 @@ public class Enemy : MonoBehaviour
     private void OnEnable()
     {
         _enemyScanner.PlayerDetect += OnPlayerDetect;
-        _enemyAttackScanner.PlayerStayAttackRange += OnPlayerStayAttackRange; 
+        _enemyAttackScanner.PlayerStayAttackRange += OnPlayerStayAttackRange;
+        _health.HealthChanged += OnHealthChanged;
     }
 
     private void OnDisable()
     {
         _enemyScanner.PlayerDetect -= OnPlayerDetect;
         _enemyAttackScanner.PlayerStayAttackRange -= OnPlayerStayAttackRange;
+        _health.HealthChanged -= OnHealthChanged;
     }
 
     private void Update()
     {
        _enemyStateMachine.Update();
+    }
+
+    private void OnHealthChanged(int health, int oldHealth)
+    {
+        if (oldHealth > health)
+            _animator.SetTrigger(HurtTrigger);
     }
 
     private void OnPlayerDetect(Player player, bool playerEnter)
